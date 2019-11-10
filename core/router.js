@@ -1,6 +1,6 @@
 import _Native from './native';
 import Bus from './bus';
-import Config from '../../src/config';
+import Config from '@src/config';
 import Theme from '../includes/theme';
 import { $RxElement, Component } from '../core/components';
 import { PropUtil } from '../utils/prop-util';
