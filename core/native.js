@@ -363,6 +363,9 @@ class Native {
       if(item.$animation) {
         rule = rule.concat(Parser.parseAnimation(item.$animation));
       }
+      if(item.$responsiveness) {
+        rule = rule.concat(Parser.parseResponsive(item));
+      }
       for(const prop in parsedProperties) {
         if(prop == 'events') {
           for(let i = 0; i < parsedProperties[prop].length; i++) {

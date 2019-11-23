@@ -2,7 +2,7 @@ export const createSheet = function (data) {
   let style;
   const allStyles = document.head.getElementsByTagName('style');
   for(let n = 0; n < allStyles.length; n++) {
-    if(allStyles[n].childNodes[0].nodeType == allStyles[n].TEXT_NODE 
+    if(allStyles[n].childNodes[0].nodeType == allStyles[n].TEXT_NODE
       && allStyles[n].childNodes.length == 1) {
       style = allStyles[n];
     }
@@ -49,7 +49,7 @@ export const updateRules = function (sheet, rules) {
         for(let j = 0; j < newX.length; j++) {
           let set = false;
           for(let k = 0; k < oldX.length; k++) {
-            if(pair(oldX[k]).name == pair(newX[j]).name){ 
+            if(pair(oldX[k]).name == pair(newX[j]).name){
               if(pair(oldX[k]).value != pair(newX[j]).value) {
                 oldX[k] = depair(pair(oldX[k]).name, pair(newX[j]).value);
               }

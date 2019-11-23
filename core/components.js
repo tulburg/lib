@@ -274,6 +274,182 @@ export class $RxElement {
 window.RxElement = $RxElement;
 
 const LayoutFunctions = {
+  absCenter: function(v) {
+    if(v) {
+      if(this.root) {
+        this.root.position('relative');
+        this.position('absolute').top('50%').left('50%')
+          .transform('translate(-50%, -50%)');
+        this.$absCenter = v;
+        return this;
+      }else {
+        Handler.Warning(Handler.Codes.absParent);
+        return;
+      }
+    }
+    return this.$absCenter;
+  },
+  absCenterRight: function(v) {
+    if(v) {
+      if(this.root) {
+        this.root.position('relative');
+        this.position('absolute').top('50%').right(v)
+          .transform('translateY(-50%)');
+        this.$absCenterRight = v;
+        return this;
+      }else {
+        Handler.Warning(Handler.Codes.absParent);
+        return;
+      }
+    }
+    return this.$absCenterRight;
+  },
+  absCenterLeft: function(v) {
+    if(v) {
+      if(this.root) {
+        this.root.position('relative');
+        this.position('absolute').top('50%').left(v)
+          .transform('translateY(-50%)');
+        this.$absCenterLeft = v;
+        return this;
+      }else {
+        Handler.Warning(Handler.Codes.absParent);
+        return;
+      }
+    }
+    return this.$absCenterLeft;
+  },
+  absCenterTop: function(v) {
+    if(v) {
+      if(this.root) {
+        this.root.position('relative');
+        this.position('absolute').left('50%').top(v)
+          .transform('translateX(-50%)');
+        this.$absCenterTop = v;
+        return this;
+      }else {
+        Handler.Warning(Handler.Codes.absParent);
+        return;
+      }
+    }
+    return this.$absCenterTop;
+  },
+  absCenterBottom: function(v) {
+    if(v) {
+      if(this.root) {
+        this.root.position('relative');
+        this.position('absolute').left('50%').bottom(v)
+          .transform('translateX(-50%)');
+        this.$absCenterBottom = v;
+        return this;
+      }else {
+        Handler.Warning(Handler.Codes.absParent);
+        return;
+      }
+    }
+    return this.$absCenterBottom;
+  },
+  absPosition: function(v) {
+    if(v) {
+      if(this.root) {
+        this.root.position('relative');
+        this.position('absolute').top(v[0]).right(v[1]).bottom(v[2])
+          .left(v[3]);
+        this.$absPosition = v;
+        return this;
+      }else {
+        Handler.Warning(Handler.Codes.absParent);
+        return;
+      }
+    }
+    return this.$absPosition;
+  },
+  absTopRight: function(v) {
+    if(v) {
+      v = arguments.length === 1 ? v[0] : v;
+      if(this.root) {
+        this.root.position('relative');
+        this.position('absolute').top(v[0]).right(v[1]);
+        this.$absTopRight = v;
+        return this;
+      }else {
+        Handler.Warning(Handler.Codes.absParent);
+        return;
+      }
+    }
+    return this.$absTopRight;
+  },
+  absTopLeft: function(v) {
+    if(v) {
+      v = arguments.length === 1 ? v[0] : v;
+      if(this.root) {
+        this.root.position('relative');
+        this.position('absolute').top(v[0]).left(v[1]);
+        this.$absTopLeft = v;
+        return this;
+      }else {
+        Handler.Warning(Handler.Codes.absParent);
+        return;
+      }
+    }
+    return this.$absTopLeft;
+  },
+  absBottomRight: function(v) {
+    if(v) {
+      if(this.root) {
+        this.root.position('relative');
+        this.position('absolute').bottom(v[0]).right(v[1]);
+        this.$absBottomRight = v;
+        return this;
+      }else {
+        Handler.Warning(Handler.Codes.absParent);
+        return;
+      }
+    }
+    return this.$absBottomRight;
+  },
+  absBottomLeft: function(v) {
+    if(v) {
+      if(this.root) {
+        this.root.position('relative');
+        this.position('absolute').bottom(v[0]).left(v[1]);
+        this.$absBottomLeft = v;
+        return this;
+      }else {
+        Handler.Warning(Handler.Codes.absParent);
+        return;
+      }
+    }
+    return this.$absBottomLeft;
+  },
+  absCenterVertical: function(v) {
+    if(v) {
+      if(this.root) {
+        this.root.position('relative');
+        this.position('absolute').top('50%').transform('translateY(-50%)');
+        this.$absCenterVertical = v;
+        return this;
+      }else {
+        Handler.Warning(Handler.Codes.absParent);
+        return;
+      }
+    }
+    return this.$absCenterVertical;
+  },
+  absCenterHorizontal: function(v) {
+    if(v) {
+      if(this.root) {
+        this.root.position('relative');
+        this.position('absolute').left('50%').transform('translateX(-50%)');
+        this.$absCenterHorizontal = v;
+        return this;
+      }else {
+        Handler.Warning(Handler.Codes.absParent);
+        return;
+      }
+    }
+    return this.$absCenterHorizontal;
+  },
   addClassName: function(name) {
     if(!this.className.match(name)) {
       this.className = this.className + ' ' + name;
@@ -363,6 +539,31 @@ const LayoutFunctions = {
     }
     return this.$animation;
   },
+  aspectRatio: function(v) {
+    if(v) {
+      v = arguments.length === 1 ? v[0] : v;
+      this.position('relative');
+      this.pseudoBefore({
+        display: 'block', content: '', width: '100%',
+        paddingTop: `(${v[1]} / ${v[0]}) * 100%`
+      });
+      this.pseudoFirstChild({
+        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0
+      });
+      this.$aspectRatio = v;
+      return this;
+    }
+    return this.$aspectRatio;
+  },
+  backgroundLinearGradient: function(v) {
+    if(v) {
+      v = arguments.length === 1 ? v[0] : v;
+      this.background(`linear-gradient(${v[0]}, ${v[1]}, ${v[2]})`);
+      this.$backgroundGradient = v;
+      return this;
+    }
+    return this.$backgroundGradient;
+  },
   childVerticalSpacing: function(margin) {
     if(margin) {
       this.globalStyle({ margin: [ margin / 2, 0, margin / 2, 0] })
@@ -383,187 +584,15 @@ const LayoutFunctions = {
     }
     return this.$childHorizontalSpacing;
   },
-  size: function(v) {
+  clearFix: function(v) {
     if(v) {
-      this.height(v[1]).width(v[0]);
-      this.$size = v;
+      this.pseudoAfter({
+        content: '', display: 'table', clear: 'both'
+      });
+      this.$clearFix = v;
       return this;
     }
-    return this.$size;
-  },
-  absPosition: function(v) {
-    if(v) {
-      if(this.root) {
-        this.root.position('relative');
-        this.position('absolute').top(v[0]).right(v[1]).bottom(v[2])
-          .left(v[3]);
-        this.$absPosition = v;
-        return this;
-      }else {
-        Handler.Warning(Handler.Codes.absParent);
-        return;
-      }
-    }
-    return this.$absPosition;
-  },
-  absCenter: function(v) {
-    if(v) {
-      if(this.root) {
-        this.root.position('relative');
-        this.position('absolute').top('50%').left('50%')
-          .transform('translate(-50%, -50%)');
-        this.$absCenter = v;
-        return this;
-      }else {
-        Handler.Warning(Handler.Codes.absParent);
-        return;
-      }
-    }
-    return this.$absCenter;
-  },
-  absCenterRight: function(v) {
-    if(v) {
-      if(this.root) {
-        this.root.position('relative');
-        this.position('absolute').top('50%').right(v)
-          .transform('translateY(-50%)');
-        this.$absCenterRight = v;
-        return this;
-      }else {
-        Handler.Warning(Handler.Codes.absParent);
-        return;
-      }
-    }
-    return this.$absCenterRight;
-  },
-  absCenterLeft: function(v) {
-    if(v) {
-      if(this.root) {
-        this.root.position('relative');
-        this.position('absolute').top('50%').left(v)
-          .transform('translateY(-50%)');
-        this.$absCenterLeft = v;
-        return this;
-      }else {
-        Handler.Warning(Handler.Codes.absParent);
-        return;
-      }
-    }
-    return this.$absCenterLeft;
-  },
-  absCenterTop: function(v) {
-    if(v) {
-      if(this.root) {
-        this.root.position('relative');
-        this.position('absolute').left('50%').top(v)
-          .transform('translateX(-50%)');
-        this.$absCenterTop = v;
-        return this;
-      }else {
-        Handler.Warning(Handler.Codes.absParent);
-        return;
-      }
-    }
-    return this.$absCenterTop;
-  },
-  absCenterBottom: function(v) {
-    if(v) {
-      if(this.root) {
-        this.root.position('relative');
-        this.position('absolute').left('50%').bottom(v)
-          .transform('translateX(-50%)');
-        this.$absCenterBottom = v;
-        return this;
-      }else {
-        Handler.Warning(Handler.Codes.absParent);
-        return;
-      }
-    }
-    return this.$absCenterBottom;
-  },
-  absTopRight: function(v) {
-    if(v) {
-      if(this.root) {
-        this.root.position('relative');
-        this.position('absolute').top(v[0]).right(v[1]);
-        this.$absTopRight = v;
-        return this;
-      }else {
-        Handler.Warning(Handler.Codes.absParent);
-        return;
-      }
-    }
-    return this.$absTopRight;
-  },
-  absTopLeft: function(v) {
-    if(v) {
-      if(this.root) {
-        this.root.position('relative');
-        this.position('absolute').top(v[0]).left(v[1]);
-        this.$absTopLeft = v;
-        return this;
-      }else {
-        Handler.Warning(Handler.Codes.absParent);
-        return;
-      }
-    }
-    return this.$absTopLeft;
-  },
-  absBottomRight: function(v) {
-    if(v) {
-      if(this.root) {
-        this.root.position('relative');
-        this.position('absolute').bottom(v[0]).right(v[1]);
-        this.$absBottomRight = v;
-        return this;
-      }else {
-        Handler.Warning(Handler.Codes.absParent);
-        return;
-      }
-    }
-    return this.$absBottomRight;
-  },
-  absBottomLeft: function(v) {
-    if(v) {
-      if(this.root) {
-        this.root.position('relative');
-        this.position('absolute').bottom(v[0]).left(v[1]);
-        this.$absBottomLeft = v;
-        return this;
-      }else {
-        Handler.Warning(Handler.Codes.absParent);
-        return;
-      }
-    }
-    return this.$absBottomLeft;
-  },
-  absCenterVertical: function(v) {
-    if(v) {
-      if(this.root) {
-        this.root.position('relative');
-        this.position('absolute').top('50%').transform('translateY(-50%)');
-        this.$absCenterVertical = v;
-        return this;
-      }else {
-        Handler.Warning(Handler.Codes.absParent);
-        return;
-      }
-    }
-    return this.$absCenterVertical;
-  },
-  absCenterHorizontal: function(v) {
-    if(v) {
-      if(this.root) {
-        this.root.position('relative');
-        this.position('absolute').left('50%').transform('translateX(-50%)');
-        this.$absCenterHorizontal = v;
-        return this;
-      }else {
-        Handler.Warning(Handler.Codes.absParent);
-        return;
-      }
-    }
-    return this.$absCenterHorizontal;
+    return this.$clearFix;
   },
   flexSpaceBetween: function(v) {
     if(v) {
@@ -581,30 +610,6 @@ const LayoutFunctions = {
     }
     return this.$flexCenter;
   },
-  aspectRatio: function(v) {
-    if(v) {
-      this.position('relative');
-      this.pseudoBefore({
-        display: 'block', content: '', width: '100%',
-        paddingTop: `(${v[1]} / ${v[0]}) * 100%`
-      });
-      this.pseudoFirstChild({
-        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0
-      });
-      this.$aspectRatio = v;
-      return this;
-    }
-    return this.$aspectRatio;
-  },
-  truncateText: function(v) {
-    if(v) {
-      this.overflow('hidden').textOverflow('ellipsis')
-        .whiteSpace('nowrap');
-      this.$truncateText = v;
-      return this;
-    }
-    return this.$truncateText;
-  },
   relCenterHorizontal: function(v) {
     if(v){
       this.margin(['auto', 'auto']);
@@ -613,29 +618,46 @@ const LayoutFunctions = {
     }
     return this.$relCenterHorizontal;
   },
-  clearFix: function(v) {
-    if(v) {
-      this.pseudoAfter({
-        content: '', display: 'table', clear: 'both'
-      });
-      this.$clearFix = v;
-      return this;
-    }
-    return this.$clearFix;
-  },
-  backgroundLinearGradient: function(v) {
-    if(v) {
-      this.background(`linear-gradient(${v[0]}, ${v[1]}, ${v[2]})`);
-      this.$backgroundGradient = v;
-      return this;
-    }
-    return this.$backgroundGradient;
-  },
   removeClassName: function(name) {
     if(this.className.match(name)) {
       this.className.replace(' '+name, '');
     }
     return this;
+  },
+  replaceTextTag: function(text, tagObject) {
+    const all = text.match(/([\${\w]+\([\w,\s]*\)})/g),
+    children = [],
+    p = (t) => {
+      all.map((i, inx) => {
+        const tag = i.match(/{([\w]+\()/g)[0].replace('{','').replace('(',''),
+        args = i.match(/(\([\w,]+)/g).map(i => i.replace('(', ''));
+        children.push(t.slice(0, t.indexOf(i)));
+        children.push(tagObject[tag](...args));
+        t = t.slice(t.indexOf(i) + i.length);
+        if(inx === all.length - 1) {
+          if(t.length > 0) children.push(t);
+        }
+      });
+    };
+    p(text);
+    this.$children = this.$children.concat(children);
+    return this;
+  },
+  respond: function(key, props) {
+    // Check all
+
+    this.$responsiveness = this.$responsiveness || [];
+    this.$responsiveness.push({key: key, props: props});
+    return this;
+  },
+  size: function(...v) {
+    if(v) {
+      v = arguments.length === 1 ? v[0] : v;
+      this.height(v[1]).width(v[0]);
+      this.$size = v;
+      return this;
+    }
+    return this.$size;
   },
   stack: function(children, options) {
     const o = options||{};
@@ -659,6 +681,15 @@ const LayoutFunctions = {
       return this;
     }
     return this.$stackVertical;
+  },
+  truncateText: function(v) {
+    if(v) {
+      this.overflow('hidden').textOverflow('ellipsis')
+        .whiteSpace('nowrap');
+      this.$truncateText = v;
+      return this;
+    }
+    return this.$truncateText;
   }
 }
 

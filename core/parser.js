@@ -172,6 +172,19 @@ const Parser = {
     keyframeRule += '}';
     rules.push(keyframeRule);
     return rules;
+  },
+
+  parseResponsive: function(component) {
+    const rules = [], res = component.$responsiveness;
+    for(let i = 0; i < res.length; i++) {
+      const item = res[i], rule = item.key + ' { ';
+      rule += component.tagName + '.' + component.className.replace(' ', '.') + ' { ';
+      rule += Parser.parseNativeStyle(item.props);
+      rule += '} } ';
+      rules.push(rule);
+    }
+    console.log(rules);
+    return rules;
   }
 };
 
