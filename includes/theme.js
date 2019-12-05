@@ -2,14 +2,9 @@ import {
   Button as DefaultButton,
   Container as DefaultContainer,
   PageComponent as DefaultPageComponent,
-  Section as DefaultSection
+  Section as DefaultSection,
+  H1 as DefaultH1
 } from '../core/components';
-
-export class PageComponent extends DefaultPageComponent {
-  constructor() {
-    super();
-  }
-}
 
 export class Container extends DefaultContainer {
   constructor() {
@@ -18,11 +13,17 @@ export class Container extends DefaultContainer {
   }
 }
 
-export class Section extends DefaultSection {
+export class PageComponent extends DefaultPageComponent {
   constructor() {
     super();
+  }
+}
+
+export class Section extends DefaultSection {
+  constructor(padding, ...children) {
+    super(padding, children);
     this.backgroundColor(Color.background)
-      .padding(20);
+      .padding(padding);
   }
 }
 
@@ -35,22 +36,24 @@ export class GridContainer extends DefaultContainer {
   }
 }
 
-export class Layout extends DefaultContainer {
-  constructor(gridColumnTemplate, ...children) {
-    super(gridColumnTemplate, ...children);
-    this.display('grid')
-      .size('100vw', '100vh')
-      .backgroundColor(Color.background)
-      .gridTemplateColumns(gridColumnTemplate)
-      .addChild(...children)
-      .respond('@media (max-width: 480px)', {
-        gridTemplateColumns: 'auto 100% auto',
-        color: 'red'
-      })
+export class Header extends DefaultH1 {
+  constructor(text, size) {
+    super(text, size);
+    this.text(text).fontSize(size)
+      .color(Color.textDark)
+      .margin(0).padding([4, 0]);
   }
 }
 
-
+export class Button extends DefaultButton {
+  constructor(text, size){
+    super(text, size);
+    this.text(text).fontSize(size)
+      .color(Color.textDark)
+      .padding(8, 15).border(0)
+      .backgroundColor(Color.$.darken(Color.background, 30))
+  }
+}
 /// Theme Utils -------------------------------------->
 
 export const Color = {
@@ -65,7 +68,7 @@ export const Color = {
   // Utils
   $: {
     darken: (color, percent) => {
-      return this.lighten(color, -percent);
+      return Color.$.lighten(color, -percent);
     },
     lighten: (color, percent) => {
       percent = percent / 100;
@@ -98,7 +101,7 @@ export const Font = {
   // Func definition
   $: {
     rem: (px) => {
-      return px/16;
+      return px/16 + 'rem';
     }
   }
 }

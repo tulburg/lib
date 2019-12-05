@@ -183,7 +183,6 @@ const Parser = {
       rule += '} } ';
       rules.push(rule);
     }
-    console.log(rules);
     return rules;
   }
 };
