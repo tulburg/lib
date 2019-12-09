@@ -9,8 +9,8 @@ export class Component {
   constructor(args) {
     this.$level = 0;
     this.$children = [];
-    this.className = this.constructor.name;
     this.tagName = this.constructor.name;
+    this.className = this.tagName[0]+Math.random().toString(36).substr(2, 9);
     this.$nid = Native.serving
       ? Native.serving.split('-')[1]
       : Math.random().toString(36).substr(2, 9);
@@ -121,6 +121,20 @@ export class Component {
     this.className = this.tagName[0]+Math.random().toString(36).substr(2, 9);
   }
 
+  on(fns) {
+    this.$events = this.$events || [];
+    for(const fn in fns) {
+      const event = {};
+      event[fn] = fns[fn];
+      Native.bindings[Native.serving.split('-')[1]]
+        = Native.bindings[Native.serving.split('-')[1]] || [];
+      const binding = Native.bindings[Native.serving.split('-')[1]];
+      binding.push({ event: fns[fn], object: this, name: fn });
+      // this.events.push(event);
+    }
+    return this;
+  }
+
   emit(event, payload) {
     if(this.events.hasOwnProperty(event)) {
       for(let i = 0; i < this.events[event].length; i++) {
@@ -132,7 +146,7 @@ export class Component {
     return this;
   }
 
-  on(event, listener) {
+  addListener(event, listener) {
     if(this.events.hasOwnProperty(event)) {
       this.events[event].push(listener);
     }else {
@@ -141,7 +155,7 @@ export class Component {
     return this;
   }
 
-  remove(event, listener) {
+  removeListener(event, listener) {
     if(this.events.hasOwnProperty(event)) {
       if(this.events[event].indexOf(listener)) {
         this.events[event] = this.events[event].splice(this.events[event].indexOf(listener), 1);
@@ -154,7 +168,7 @@ export class Component {
     return this;
   }
 
-  once(event, listener) {
+  listenOnce(event, listener) {
     this.on(event, function(p) {
       listener(p);
       this.remove(event, listener);
@@ -226,7 +240,7 @@ export class $RxElement {
   }
 
   on(fns) {
-    this.events = this.events || [];
+    this.$events = this.$events || [];
     for(const fn in fns) {
       const event = {};
       event[fn] = fns[fn];
@@ -609,6 +623,13 @@ const LayoutFunctions = {
       return this;
     }
     return this.$flexCenter;
+  },
+  node: function(v) {
+    if(v) {
+      this.$node = v;
+      return this;
+    }
+    return this.$node;
   },
   relCenterHorizontal: function(v) {
     if(v){

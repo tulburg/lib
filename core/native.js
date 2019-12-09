@@ -77,12 +77,11 @@ class Native {
       }
     } else if (type == MOD_TYPE.update) {
       // if (!Util.props.hasOwnProperty(data.key)) {
-
-        if(!data.newObj.cssRules) {
+        // if(!data.newObj.cssRules) {
           const styles = [];
           Parser.parseProperties(data.newObj, styles);
           data.newObj.cssRules = styles;
-        }
+        // }
 
         this.patchAttrs(data.oldObj.node, data.newObj.node);
         this.patchProps(data.oldObj, data.newObj);
@@ -316,7 +315,7 @@ class Native {
         const event = this.bindings[instanceNID][i];
         const o = {};
         o[event.name] = event.event.bind(oldInstance);
-        event.object.events.push(o);
+        event.object.$events.push(o);
         this.bindings[instanceNID].splice(i, 1);
         i--;
       }
@@ -367,7 +366,7 @@ class Native {
         rule = rule.concat(Parser.parseResponsive(item));
       }
       for(const prop in parsedProperties) {
-        if(prop == 'events') {
+        if(prop == '$events') {
           for(let i = 0; i < parsedProperties[prop].length; i++) {
             for(const e in parsedProperties[prop][i]) {
               c.addEventListener(e, parsedProperties[prop][i][e], { capture: true });
@@ -381,39 +380,38 @@ class Native {
       item.cssRules = rule;
       rules = rules.concat(rule);
       if(parent) parent.appendChild(c);
+      if(item.$level === 0 && parent != undefined) {
+        const oldServing = this.serving;
+        // get a sub component load instance
+        const component = item;
+        this.components[component.name]
+          = this.components[component.name] || { structure: component.constructor };
+        const newInstance = item;
+        const nid = newInstance.nid;
+        this.serving = component.name + '-' + nid;
+        this.components[component.name][nid].route = this.router.current;
+        this.components[component.name][nid].instance = newInstance;
+
+        updateRules(this.sheet, newInstance.cssRules);
+
+        if(this.components[component.name][nid].rootNode == undefined) {
+          this.components[component.name][nid].rootNode = item.node;
+        }
+
+        if(!updateState) {
+          newInstance.emit('create', true);
+          if(newInstance.onCreate) {
+            newInstance.onCreate();
+          }
+          // parent.appendChild(item.node);
+        }
+        this.serving = oldServing;
+        this.components[component.name][nid].served = true;
+      }
       for(let i = 0; i < item.$children.length; i++) {
         if(typeof item.$children[i] === 'string') {
           c.appendChild(document.createTextNode(item.$children[i]));
         }else {
-          if(item.$level === 0 && parent != undefined) {
-            const oldServing = this.serving;
-            // get a sub component load instance
-            const component = item;
-            this.components[component.name]
-              = this.components[component.name] || { structure: component.constructor };
-            const newInstance = item;
-            const nid = newInstance.nid;
-            this.serving = component.name + '-' + nid;
-            this.components[component.name][nid].route = this.router.current;
-            this.components[component.name][nid].instance = newInstance;
-
-            updateRules(this.sheet, newInstance.cssRules);
-
-            if(this.components[component.name][nid].rootNode == undefined) {
-              this.components[component.name][nid].rootNode = item.node;
-            }
-
-            if(!updateState) {
-              newInstance.emit('create', true);
-              if(newInstance.onCreate) {
-                newInstance.onCreate();
-              }
-              parent.appendChild(item.node);
-            }
-            this.serving = oldServing;
-            this.components[component.name][nid].served = true;
-          }
-
           create(c, item.$children[i]);
         }
       }
@@ -444,7 +442,7 @@ class Native {
         const event = this.bindings[nid][i];
         const o = {};
         o[event.name] = event.event.bind(newInstance);
-        event.object.events.push(o);
+        event.object.$events.push(o);
         this.bindings[nid].splice(i, 1);
         i--;
       }
@@ -659,7 +657,7 @@ const props = (c) => {
   for(let i = 0; i < ps.length; i++) {
     const p = ps[i];
     if(p != '$children' && p != 'node' && p != 'className' && p != '__proto__'
-      && p != 'root' && p != '$level' && p != 'cssRules' && p != 'events') {
+      && p != 'root' && p != '$level' && p != 'cssRules' && p != '$events') {
       if(type(c[p] !== 'Object') && c[p] !== undefined) all[p] = c[p];
     }
   }

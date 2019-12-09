@@ -141,6 +141,8 @@ export const ProxifyComponent = (object, componentName, nid) => {
       return Reflect.get(object, name, receiver);
     },
     set: (object, name, value, receiver) => {
+      const old = object[name];
+      const oldObj = object;
       if(type(value) === 'object' && name != '$children'
         && name != '__root__' && name != 'state') {
         if(value instanceof $RxElement && !value.__proxy__) {
@@ -165,6 +167,16 @@ export const ProxifyComponent = (object, componentName, nid) => {
               w.oldvalue = value;
             }
           }
+        }
+      }
+      if(name != '__proto__' && name != '$native' && object.tagName != 'window.RxElement'
+        && name != 'tagName' && name != 'animations' && name != 'node' && name != 'root'
+        && name != 'className' && name != '$children' && name != 'cssRules') {
+        if(Native && Native.served) {
+          Native.$notify({
+            oldObj: oldObj, newObj: object, oldVal: old,
+            newVal: value, key: name
+          }, MOD_TYPE.update);
         }
       }
       return Reflect.set(object, name, value, receiver);

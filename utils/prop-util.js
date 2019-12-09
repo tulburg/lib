@@ -484,7 +484,7 @@ const PropUtil = {
     '$animation',
     'cssRules',
     'options',
-    'events',
+    '$events',
     'root',
     'node',
     'value',

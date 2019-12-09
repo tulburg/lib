@@ -1,6 +1,6 @@
 {
   "name": "@js-native/lib",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "JS-Native complete library",
   "main": "index.js",
   "scripts": {
@@ -27,5 +27,3 @@
   },
   "homepage": "https://github.com/jsnative/lib#readme"
 }
-
-

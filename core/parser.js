@@ -79,11 +79,11 @@ const Parser = {
           }
         }
       } else {
-        if (prop === 'events' && component[prop] !== undefined) {
+        if (prop === '$events' && component[prop] !== undefined) {
           properties[prop] = component[prop];
         } else if (Util.excludes.indexOf(prop) < 0 && component.$level != '0') {
           // console.log(component);
-          throw new Error('Invalid property ' + prop);
+          // throw new Error('Invalid property ' + prop);
         }
       }
     }

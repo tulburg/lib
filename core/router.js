@@ -11,6 +11,7 @@ export default class Router {
     window.RxElement = $RxElement;
     window.Bus = window.Bus || new Bus();
     window.Theme = window.Theme || (Config.theme != undefined) ? Config.theme : Theme;
+    window.Config = Config;
     new _Native(this);
     window.Native.writeGlobals(window.Theme);
 

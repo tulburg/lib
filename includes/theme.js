@@ -106,10 +106,24 @@ export const Font = {
   }
 }
 
+export const Padding = {
+  xsmall: 2,
+  small: 5,
+  medium: 8,
+  normal: 10,
+  large: 15,
+  xLarge: 20,
+  xxLarge: 30,
+  xxxLarge: 40
+}
+
 export default {
   Colors: {
     primary: '#4286f4', white: '#FFFFFF', grey: '#686868'
   },
+
+  Font: Font,
+  Padding: Padding,
 
   Globals: {
     '*': {
