@@ -56,7 +56,7 @@ const Parser = {
   parseProperties: function (component, styles) {
     const properties = {};
     let componentStyles = component.tagName+'.'
-      + component.className.replace(' ', '.') + ' { ';
+      + component.className.split(' ')[0] + ' { ';
     const props = Object.getOwnPropertyNames(component);
     for (let i = 0; i < props.length; i++) {
       const prop = props[i];

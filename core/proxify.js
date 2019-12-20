@@ -92,13 +92,27 @@ export const Proxify = (object) => {
   return new Proxy(object, {
     get: (object, name, receiver) => {
       if(name == '__proxy__') return true;
+      if(object.$hostComponent) {
+        Native.lock = Native.lock || {};
+        if(object.name === undefined && type(object[name]) !== 'function'
+          && type(name) === 'string') {
+          Native.lock.key = Native.lock.key + '.' + name;
+        }
+        if(type(name) !== 'symbol' && type(object[name]) !== 'function') {
+          Native.lock.key = object.tagName + '.' + object.className + '.' + name;
+        }
+        const [componentName, nid] = object.$hostComponent.split("-");
+        Native.lock.type = 'property';
+        Native.lock.className = componentName;
+        Native.lock.nid = nid;
+      }
       return Reflect.get(object, name, receiver);
     },
     set: (object, name, value, receiver) => {
       const old = object[name];
       const oldObj = object;
       if (value && typeof value == 'object' && name != '__proto__'
-        && name != 'root' && name != 'events' && name != 'node' && name != '$model') {
+        && name != 'root' && name != 'events' && name != '$node' && name != '$model') {
         if(value instanceof Array) {
           $observeArray(object, value, name);
         }else if(!value.__proxy__){
@@ -107,7 +121,28 @@ export const Proxify = (object) => {
       }
       object[name] = value;
       if(name != '__proto__' && name != '$native' && object.tagName != 'window.RxElement'
-        && name != 'tagName' && name != 'animations' && name != 'node' && name != 'root'
+        && name != 'tagName' && name != 'animations' && name != '$node' && name != 'root'
+        && name != 'className' && name != '$children' && name != 'cssRules') {
+        // Todo: if not a non RxElement property only
+        if(object.$hostComponent) {
+          const [componentName, nid] = object.$hostComponent.split("-");
+          const instance = Native.components[componentName][nid];
+          if(instance && instance.served) {
+            // send notification to watchlist
+            for(let i = 0; i < instance.watchlist.length; i++) {
+              const w = instance.watchlist[i];
+              if(w.prop === object.tagName + '.' + object.className + '.' + name) {
+                w.function(value, w.oldvalue);
+                w.oldvalue = value;
+              }
+            }
+          }
+        }else {
+          console.log(object);
+        }
+      }
+      if(name != '__proto__' && name != '$native' && object.tagName != 'window.RxElement'
+        && name != 'tagName' && name != 'animations' && name != '$node' && name != 'root'
         && name != 'className' && name != '$children' && name != 'cssRules') {
         if(Native && Native.served) {
           Native.$notify({

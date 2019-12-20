@@ -426,6 +426,11 @@ const PropUtil = {
         & > :after { ${parseNativeStyle(v)} }
       `;
     },
+    '$pseudoSelection': (v) => {
+      return `
+        & > ::selection { ${parseNativeStyle(v)} }
+      `;
+    },
     '$show': (v, c) => {
       if(!v) return `display: none;`;
       else return (c.$display) ? `display: ${c.$display};` : `display: block;`;
