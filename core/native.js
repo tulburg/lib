@@ -142,7 +142,7 @@ class Native {
   }
 
   $updateObjectCSS(obj, css) {
-    const selector = obj.tagName + '.' + obj.className.replace(' ', '.');
+    const selector = obj.tagName + '.' + obj.className.split(' ')[0];
     let found = false;
     for(let i = 0; i < this.sheet.cssRules.length; i++) {
       const selectorText = this.sheet.cssRules[i].selectorText;
@@ -216,7 +216,7 @@ class Native {
     const depair = (n, v) => {
       return `${n}: ${v}`;
     };
-    const selector = oldEl.tagName.toLowerCase() + '.' + oldEl.className.replace(' ', '.');
+    const selector = oldEl.tagName.toLowerCase() + '.' + oldEl.className.split(' ')[0];
     for(let m = 0; m < rules.length; m++) {
       const css = rules[m];
       for(let i = 0; i < this.sheet.cssRules.length; i++) {

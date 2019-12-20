@@ -23,7 +23,7 @@ const Parser = {
       const end = start + fnc.substr(start).indexOf('}') + 1;
       const rule = fnc.substr(start, end);
       const cssRule = rule.replace('&', comp.tagName + '.'
-        + comp.className.replace(' ', '')).trim();
+        + comp.className.split(' ')[0]).trim();
       if(cssRule.length > 20) {
         styles.push(cssRule);
       }
@@ -178,7 +178,7 @@ const Parser = {
     const rules = [], res = component.$responsiveness;
     for(let i = 0; i < res.length; i++) {
       const item = res[i], rule = item.key + ' { ';
-      rule += component.tagName + '.' + component.className.replace(' ', '.') + ' { ';
+      rule += component.tagName + '.' + component.className.split(' ')[0] + ' { ';
       rule += Parser.parseNativeStyle(item.props);
       rule += '} } ';
       rules.push(rule);

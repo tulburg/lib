@@ -521,9 +521,9 @@ const LayoutFunctions = {
         Native.sheet.insertRule(styles[i], Native.sheet.cssRules.length - 1);
       }catch(e){ console.log(e); }
     }
-    if(this.node) {
+    if(this.$node) {
       if(this.$animation) {
-        this.node.className = this.className + ' ' + this.$animation.$name;
+        this.$node.className = this.className + ' ' + this.$animation.$name;
         // this.className = this.className + ' ' + this.$animation.$name;
       }
     }else {
@@ -535,8 +535,8 @@ const LayoutFunctions = {
       for(const prop in keyframe.frame) {
         this[prop] = keyframe.frame[prop];
       }
-      // this.node.classList.remove(this.$animation.$name);
-      // this.className = Array.from(this.node.classList).join(' ');
+      // this.$node.classList.remove(this.$animation.$name);
+      // this.className = Array.from(this.$node.classList).join(' ');
     }, (this.$animation.$duration||1 + this.$animation.$delay||1) * 1000);
     return this;
   },
@@ -1161,12 +1161,12 @@ export class Input extends $RxElement {
         const lock = this.$model;
         if(lock.type === 'state') {
           const chain = lock.key.replace(lock.className+'.', '').split('.');
-          protoSet(Native.components[lock.className][lock.nid].state, chain, this.node.value);
-          notifyWatchlist(lock, this.node.value);
+          protoSet(Native.components[lock.className][lock.nid].state, chain, this.$node.value);
+          notifyWatchlist(lock, this.$node.value);
         }else if(lock.type === 'property') {
           const chain = lock.key.replace(lock.className+'.', '').split('.');
-          protoSet(Native.components[lock.className][lock.nid].instance, chain, this.node.value);
-          notifyWatchlist(lock, this.node.value);
+          protoSet(Native.components[lock.className][lock.nid].instance, chain, this.$node.value);
+          notifyWatchlist(lock, this.$node.value);
         }
       }
     });
