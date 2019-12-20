@@ -170,7 +170,7 @@ export const ProxifyComponent = (object, componentName, nid) => {
         }
       }
       if(name != '__proto__' && name != '$native' && object.tagName != 'window.RxElement'
-        && name != 'tagName' && name != 'animations' && name != 'node' && name != 'root'
+        && name != 'tagName' && name != 'animations' && name != '$node' && name != 'root'
         && name != 'className' && name != '$children' && name != 'cssRules') {
         if(Native && Native.served) {
           Native.$notify({

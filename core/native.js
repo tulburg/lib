@@ -41,7 +41,7 @@ class Native {
     }
 
     if (type == MOD_TYPE.insert) {
-      node = data.oldObj.node;
+      node = data.oldObj.$node;
       if(data.key == 'animations') {
         // Todo: animation would still be tricky, if there's no way
         // to remove applied css styles
@@ -82,7 +82,7 @@ class Native {
           data.newObj.cssRules = styles;
         // }
 
-        this.patchAttrs(data.oldObj.node, data.newObj.node);
+        this.patchAttrs(data.oldObj.$node, data.newObj.$node);
         this.patchProps(data.oldObj, data.newObj);
         this.patchCSSRules(data.oldObj, data.newObj);
         // if(node) node.parentNode.replaceChild(newNode, node);
@@ -90,9 +90,9 @@ class Native {
 
     } else if(type == MOD_TYPE.replace) {
 
-      const node = data.oldObj.node;
+      const node = data.oldObj.$node;
       this.createElement(data.newObj, false);
-      const newNode = data.newObj.node;
+      const newNode = data.newObj.$node;
       if(node) node.parentNode.replaceChild(newNode, node);
 
     } else if (type == MOD_TYPE.delete) {
@@ -104,7 +104,7 @@ class Native {
       }
 
       for(let i = 0; i < data.count; i++) {
-        const rNode = data.oldObj.$children[data.index + i].node;
+        const rNode = data.oldObj.$children[data.index + i].$node;
         if(rNode && rNode.parentNode) {
           rNode.parentNode.removeChild(rNode);
         }
@@ -326,7 +326,7 @@ class Native {
     this.serving = oldServing;
     this.createElement(newInstance, true); // createElement(parsed.tree);
     // loop through, and throw diffs
-    this.patchAttrs(oldInstance.node, newInstance.node);
+    this.patchAttrs(oldInstance.$node, newInstance.$node);
     this.loop(oldInstance.$children, newInstance.$children, oldInstance, newInstance, 0);
     // update rootNode
     // update the instance
@@ -374,7 +374,7 @@ class Native {
           c.setAttribute(prop, parsedProperties[prop]);
         }
       }
-      item.node = c;
+      item.$node = c;
       item.cssRules = rule;
       rules = rules.concat(rule);
       if(parent) parent.appendChild(c);
@@ -386,7 +386,7 @@ class Native {
           = this.components[component.name] || { structure: component.constructor };
         const newInstance = item;
         const nid = newInstance.nid;
-        this.serving = component.name + '-' + nid;
+        // this.serving = component.name + '-' + nid;
         this.components[component.name][nid].route = this.router.current;
         this.components[component.name][nid].instance = newInstance;
 
@@ -408,7 +408,7 @@ class Native {
         updateRules(this.sheet, newInstance.cssRules);
 
         if(this.components[component.name][nid].rootNode == undefined) {
-          this.components[component.name][nid].rootNode = item.node;
+          this.components[component.name][nid].rootNode = item.$node;
         }
 
         if(!updateState) {
@@ -416,7 +416,7 @@ class Native {
           if(newInstance.onCreate) {
             newInstance.onCreate();
           }
-          // parent.appendChild(item.node);
+          // parent.appendChild(item.$node);
         }
         this.serving = oldServing;
         this.components[component.name][nid].served = true;
@@ -511,8 +511,8 @@ class Native {
       if(arr2.indexOf(a) < 0) {
         // setText(p1, getText(p2));
         p1.$children[index] = b;
-        if(p1.node.childNodes[index].nodeType === Element.TEXT_NODE) {
-          p1.node.childNodes[index].textContent = b;
+        if(p1.$node.childNodes[index].nodeType === Element.TEXT_NODE) {
+          p1.$node.childNodes[index].textContent = b;
         }
         this.loop(arr1, arr2, p1, p2, index);
       }
@@ -530,7 +530,7 @@ class Native {
                 const oldInstance = this.components[name][nid].instance;
                 this.components[name][nid].served = false;
                 this.components[name].state = this.components[name][nid].state;
-                this.patchAttrs(oldInstance.node, b.node);
+                this.patchAttrs(oldInstance.$node, b.$node);
                 this.loop(oldInstance.$children, b.$children, oldInstance, b, 0);
 
                 oldInstance.emit('update', this.components[name][nid].state);
@@ -544,11 +544,11 @@ class Native {
               } else {
                 // must patch strongly
                 // console.log("> must patch", props(a), props(b))
-                this.patchAttrs(a.node, b.node);
-                // this.patchCSS(a.node, b.cssRules);
+                this.patchAttrs(a.$node, b.$node);
+                // this.patchCSS(a.$node, b.cssRules);
                 this.patchProps(a, b);
                 this.patchCSSRules(a, b);
-                b.node = a.node;
+                b.$node = a.$node;
 
                 // todo: i think you should the Native instance of
                 // b if, its a component
