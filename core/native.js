@@ -26,7 +26,6 @@ class Native {
   // data: { oldObj, newObj, oldVal, newVal, key, index, count }
   // type: MOD_TYPE
   $notify (data, type) {
-    // console.trace(data, type);
     const $ = (id) => document.querySelector('.'+id);
     let newNode, node, styles;
     if (type == MOD_TYPE.insert) {
@@ -368,9 +367,8 @@ class Native {
       for(const prop in parsedProperties) {
         if(prop == '$events') {
           for(let i = 0; i < parsedProperties[prop].length; i++) {
-            for(const e in parsedProperties[prop][i]) {
-              c.addEventListener(e, parsedProperties[prop][i][e], { capture: true });
-            }
+            const e = parsedProperties[prop][i];
+            c.addEventListener(e.name, e.event, { capture: true });
           }
         }else {
           c.setAttribute(prop, parsedProperties[prop]);
@@ -391,6 +389,21 @@ class Native {
         this.serving = component.name + '-' + nid;
         this.components[component.name][nid].route = this.router.current;
         this.components[component.name][nid].instance = newInstance;
+
+        if(this.bindings[nid]) {
+          for(let i = 0; i < this.bindings[nid].length; i++) {
+            const event = this.bindings[nid][i];
+            const o = {};
+            o[event.name] = event.event.bind(newInstance);
+            event.object.$events.push(o);
+            c.addEventListener(event.name, event.event, { capture: true });
+            this.bindings[nid].splice(i, 1);
+            i--;
+          }
+          if(this.bindings[nid].length < 1) {
+            delete this.bindings[nid];
+          }
+        }
 
         updateRules(this.sheet, newInstance.cssRules);
 

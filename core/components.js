@@ -11,9 +11,7 @@ export class Component {
     this.$children = [];
     this.tagName = this.constructor.name;
     this.className = this.tagName[0]+Math.random().toString(36).substr(2, 9);
-    this.$nid = Native.serving
-      ? Native.serving.split('-')[1]
-      : Math.random().toString(36).substr(2, 9);
+    this.$nid = Math.random().toString(36).substr(2, 9);
     Native.components[this.name] = Native.components[this.name] || { structure: this.constructor };
     Native.components[this.name][this.$nid] = { served: false, watchlist: [] };
     Native.components[this.name][this.$nid].args
@@ -126,9 +124,9 @@ export class Component {
     for(const fn in fns) {
       const event = {};
       event[fn] = fns[fn];
-      Native.bindings[Native.serving.split('-')[1]]
-        = Native.bindings[Native.serving.split('-')[1]] || [];
-      const binding = Native.bindings[Native.serving.split('-')[1]];
+      Native.bindings[this.$nid]
+        = Native.bindings[this.$nid] || [];
+      const binding = Native.bindings[this.$nid];
       binding.push({ event: fns[fn], object: this, name: fn });
       // this.events.push(event);
     }
@@ -244,10 +242,16 @@ export class $RxElement {
     for(const fn in fns) {
       const event = {};
       event[fn] = fns[fn];
-      Native.bindings[Native.serving.split('-')[1]]
-        = Native.bindings[Native.serving.split('-')[1]] || [];
-      const binding = Native.bindings[Native.serving.split('-')[1]];
-      binding.push({ event: fns[fn], object: this, name: fn });
+      if(type(fns[fn]) !== 'function') throw `${fns[fn]} is not a function`;
+      // console.log(Function.prototype.bind.apply(fns[fn], this), this);
+      this.$events.push({
+        event: fns[fn].bind(this),
+        name: fn, object: this
+      });
+      // Native.bindings[Native.serving.split('-')[1]]
+      //   = Native.bindings[Native.serving.split('-')[1]] || [];
+      // const binding = Native.bindings[Native.serving.split('-')[1]];
+      // binding.push({ event: fns[fn], object: this, name: fn });
       // this.events.push(event);
     }
     return this;
@@ -364,7 +368,8 @@ const LayoutFunctions = {
     return this.$absCenterBottom;
   },
   absPosition: function(v) {
-    if(v) {
+    if(arguments.length > 0) {
+      const v = arguments.length === 1 ? arguments[0] : Array.from(arguments);
       if(this.root) {
         this.root.position('relative');
         this.position('absolute').top(v[0]).right(v[1]).bottom(v[2])
@@ -379,8 +384,8 @@ const LayoutFunctions = {
     return this.$absPosition;
   },
   absTopRight: function(v) {
-    if(v) {
-      v = arguments.length === 1 ? v[0] : v;
+    if(arguments.length > 0) {
+      const v = arguments.length === 1 ? arguments[0] : Array.from(arguments);
       if(this.root) {
         this.root.position('relative');
         this.position('absolute').top(v[0]).right(v[1]);
@@ -393,9 +398,9 @@ const LayoutFunctions = {
     }
     return this.$absTopRight;
   },
-  absTopLeft: function(v) {
-    if(v) {
-      v = arguments.length === 1 ? v[0] : v;
+  absTopLeft: function() {
+    if(arguments.length > 0) {
+      const v = arguments.length === 1 ? arguments[0] : Array.from(arguments);
       if(this.root) {
         this.root.position('relative');
         this.position('absolute').top(v[0]).left(v[1]);
@@ -409,7 +414,8 @@ const LayoutFunctions = {
     return this.$absTopLeft;
   },
   absBottomRight: function(v) {
-    if(v) {
+    if(arguments.length > 0) {
+      const v = arguments.length === 1 ? arguments[0] : Array.from(arguments);
       if(this.root) {
         this.root.position('relative');
         this.position('absolute').bottom(v[0]).right(v[1]);
@@ -423,7 +429,8 @@ const LayoutFunctions = {
     return this.$absBottomRight;
   },
   absBottomLeft: function(v) {
-    if(v) {
+    if(arguments.length > 0) {
+      const v = arguments.length === 1 ? arguments[0] : Array.from(arguments);
       if(this.root) {
         this.root.position('relative');
         this.position('absolute').bottom(v[0]).left(v[1]);
@@ -469,6 +476,10 @@ const LayoutFunctions = {
       this.className = this.className + ' ' + name;
     }
     return this;
+  },
+  removeClassName: function(name) {
+    this.className = this.className.replace(name, '')
+    this.className = this.className.trim();
   },
   animate: function(...args) {
     const animation = args[0];
@@ -553,9 +564,9 @@ const LayoutFunctions = {
     }
     return this.$animation;
   },
-  aspectRatio: function(v) {
-    if(v) {
-      v = arguments.length === 1 ? v[0] : v;
+  aspectRatio: function() {
+    if(arguments.length > 0) {
+      const v = arguments.length === 1 ? arguments[0] : Array.from(arguments);
       this.position('relative');
       this.pseudoBefore({
         display: 'block', content: '', width: '100%',
@@ -569,9 +580,9 @@ const LayoutFunctions = {
     }
     return this.$aspectRatio;
   },
-  backgroundLinearGradient: function(v) {
-    if(v) {
-      v = arguments.length === 1 ? v[0] : v;
+  backgroundLinearGradient: function() {
+    if(arguments.length > 0) {
+      const v = arguments.length === 1 ? arguments[0] : Array.from(arguments);
       this.background(`linear-gradient(${v[0]}, ${v[1]}, ${v[2]})`);
       this.$backgroundGradient = v;
       return this;
@@ -624,6 +635,27 @@ const LayoutFunctions = {
     }
     return this.$flexCenter;
   },
+  tag: function(tag) {
+    if(tag !== undefined) {
+      this.$tag = tag;
+      return this;
+    }
+    return this.$tag;
+  },
+  getChild(predicate) {
+    const matches = [];
+    const children = this.$children.filter((child, i) => {
+      const keys = window.Object.keys(predicate), check = keys.length;
+      let valid = 0;
+      keys.forEach((key, index) => {
+        if(predicate[key] === child['$' + key]) {
+          valid += 1;
+        }
+      });
+      if(valid === check) return true;
+    });
+    return children[0];
+  },
   node: function(v) {
     if(v) {
       this.$node = v;
@@ -672,8 +704,8 @@ const LayoutFunctions = {
     return this;
   },
   size: function(...v) {
-    if(v) {
-      v = arguments.length === 1 ? v[0] : v;
+    if(arguments.length > 0) {
+      const v = arguments.length === 1 ? arguments[0] : Array.from(arguments);
       this.height(v[1]).width(v[0]);
       this.$size = v;
       return this;
@@ -1323,6 +1355,13 @@ export class Source extends $RxElement {
   constructor() {
     super();
     this.$init('source');
+  }
+}
+
+export class Span extends $RxElement {
+  constructor() {
+    super();
+    this.$init('span');
   }
 }
 
