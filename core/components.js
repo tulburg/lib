@@ -12,6 +12,7 @@ export class Component {
     this.tagName = this.constructor.name;
     this.className = this.tagName[0]+Math.random().toString(36).substr(2, 9);
     this.$nid = Math.random().toString(36).substr(2, 9);
+    Native.serving = this.name + "-" + this.$nid;
     Native.components[this.name] = Native.components[this.name] || { structure: this.constructor };
     Native.components[this.name][this.$nid] = { served: false, watchlist: [] };
     Native.components[this.name][this.$nid].args
@@ -182,6 +183,7 @@ export class $RxElement {
     this.tagName = 'window.$RxElement';
     this.root = undefined;
     this.events = undefined;
+    this.$hostComponent = Native.serving;
     return Proxify(this);
   }
 
@@ -472,14 +474,16 @@ const LayoutFunctions = {
     return this.$absCenterHorizontal;
   },
   addClassName: function(name) {
-    if(!this.className.match(name)) {
-      this.className = this.className + ' ' + name;
+    if(this.$node) {
+      if(!this.$node.classList || !this.$node.classList.contains(name)) {
+        this.$node.classList.add(name);
+      }
+    }else {
+      if(!this.className.match(name)) {
+        this.className = this.className + ' ' + name;
+      }
     }
     return this;
-  },
-  removeClassName: function(name) {
-    this.className = this.className.replace(name, '')
-    this.className = this.className.trim();
   },
   animate: function(...args) {
     const animation = args[0];
@@ -672,7 +676,9 @@ const LayoutFunctions = {
     return this.$relCenterHorizontal;
   },
   removeClassName: function(name) {
-    if(this.className.match(name)) {
+    if(this.$node) {
+      this.$node.classList.remove(name);
+    }else if(this.className.match(name)) {
       this.className.replace(' '+name, '');
     }
     return this;

@@ -442,7 +442,6 @@ class Native {
     if(!component) {
       throw new Error('Can\'t find component '+route.name);
     }
-    this.serving = component.name + '-' + Math.random().toString(36).substr(2, 9);
     this.components[component.name] = this.components[component.name] || { structure: component };
     const newInstance = new route.component();
     const nid = newInstance.nid;
