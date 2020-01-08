@@ -27,7 +27,7 @@ export default class Router {
               enumerable: true,
               configurable: true
             });
-            this['${prop}'] = arguments[0];
+            this['${prop}'] = arguments.length === 1 ? arguments[0] : Array.from(arguments);
           }else return this.${prop};
           return this;
         }`

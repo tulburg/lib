@@ -9,8 +9,8 @@ export class Component {
   constructor(args) {
     this.$level = 0;
     this.$children = [];
-    this.tagName = this.constructor.name;
-    this.className = this.tagName[0]+Math.random().toString(36).substr(2, 9);
+    this.tagName = this.constructor.name.toLowerCase();
+    this.className = this.tagName[0].toLowerCase() + Math.random().toString(36).substr(2, 9);
     this.$nid = Math.random().toString(36).substr(2, 9);
     Native.serving = this.name + "-" + this.$nid;
     Native.components[this.name] = Native.components[this.name] || { structure: this.constructor };
@@ -117,7 +117,7 @@ export class Component {
 
   $init(tagName) {
     this.tagName = tagName;
-    this.className = this.tagName[0]+Math.random().toString(36).substr(2, 9);
+    this.className = this.tagName[0].toLowerCase() + Math.random().toString(36).substr(2, 9);
   }
 
   on(fns) {
@@ -287,7 +287,7 @@ export class $RxElement {
 
   $init(tagName) {
     this.tagName = tagName;
-    this.className = this.tagName[0]+Math.random().toString(36).substr(2, 9);
+    this.className = this.tagName[0].toLowerCase() + Math.random().toString(36).substr(2, 9);
   }
 }
 
@@ -1406,7 +1406,7 @@ export class TD extends $RxElement {
   }
 }
 
-export class Textarea extends $RxElement {
+export class TextArea extends $RxElement {
   constructor() {
     super();
     this.$init('textarea');

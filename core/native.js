@@ -1,6 +1,7 @@
 import Parser from './parser';
 import { createSheet, updateRules } from './style';
 import { MOD_TYPE } from './util';
+import { $RxElement } from './components';
 
 class Native {
   constructor (router) {
@@ -9,6 +10,7 @@ class Native {
     this.bonds = {};
     this.bindings = {};
     this.components = {};
+    this.createEventQueue = [];
     this.sheet = createSheet([]);
     return this;
   }
@@ -78,7 +80,9 @@ class Native {
       // if (!Util.props.hasOwnProperty(data.key)) {
         // if(!data.newObj.cssRules) {
           const styles = [];
-          Parser.parseProperties(data.newObj, styles);
+          // if(data.newObj instanceof $RxElement) {
+            Parser.parseProperties(data.newObj, styles);
+          // }
           data.newObj.cssRules = styles;
         // }
 
@@ -405,19 +409,22 @@ class Native {
           }
         }
 
-        updateRules(this.sheet, newInstance.cssRules);
+        queueMicrotask(() => {
+          updateRules(this.sheet, newInstance.cssRules);
 
-        if(this.components[component.name][nid].rootNode == undefined) {
-          this.components[component.name][nid].rootNode = item.$node;
-        }
-
-        if(!updateState) {
-          newInstance.emit('create', true);
-          if(newInstance.onCreate) {
-            newInstance.onCreate();
+          if(this.components[component.name][nid].rootNode == undefined) {
+            this.components[component.name][nid].rootNode = item.$node;
           }
-          // parent.appendChild(item.$node);
-        }
+        })
+
+        queueMicrotask(() => {
+          if(!updateState) {
+            newInstance.emit('create', true);
+            if(newInstance.onCreate) {
+              this.createEventQueue.push(newInstance.onCreate.bind(newInstance));
+            }
+          }
+        })
         this.serving = oldServing;
         this.components[component.name][nid].served = true;
       }
@@ -486,14 +493,18 @@ class Native {
     if(parent.childNodes.length > 2) {
       console.warn('Loading a component on a non empty container!');
     }
-    parent.appendChild(rootNode);
+    queueMicrotask(() => parent.appendChild(rootNode));
     // setup tree
     // this.components[route.name].tree = parsed.tree;
     // notify component
-    newInstance.emit('create', true);
-    if(newInstance.onCreate) {
-      newInstance.onCreate();
-    }
+    queueMicrotask(() => {
+      newInstance.emit('create', true);
+      if(newInstance.onCreate) {
+        newInstance.onCreate();
+      }
+      this.createEventQueue.forEach(i => Function.prototype.call.apply(i));
+      this.createEventQueue = [];
+    });
     this.serving = undefined;
     this.components[component.name][nid].served = true;
     this.served = true;

@@ -44,7 +44,7 @@ const PropUtil = {
     '$animationPlayState': 'css.animation-play-state',
     '$animationTimingFunction': 'css.animation-timing-function',
     '$backfaceVisibility': 'css.backface-visibility',
-    '$background': 'css.background-color',
+    '$background': 'css.background',
     '$backgroundAttachment': 'css.background-attachment',
     '$backgroundClip': 'css.background-clip',
     '$backgroundColor': 'css.background-color',
@@ -160,7 +160,14 @@ const PropUtil = {
     '$height': 'css.height',
     '$hyphens': 'css.hyphens',
     '$isolation': 'css.isolation',
+    '$inset': 'css.inset',
+    '$insetBottom': 'css.inset-bottom',
+    '$insetLeft': 'css.inset-left',
+    '$insetRight': 'css.inset-right',
+    '$insetTop': 'css.inset-top',
     '$justifyContent': 'css.justify-content',
+    '$justifySelf': 'css.justify-self',
+    '$justifyItems': 'css.justify-items',
     '$left': 'css.left',
     '$letterSpacing': 'css.letter-spacing',
     '$lineBreak': 'css.line-break',
@@ -261,6 +268,8 @@ const PropUtil = {
     '$archive': 'attr.archive',
     '$as': 'attr.as',
     '$async': 'attr.async',
+    '$attrHeight': 'attr.height',
+    '$attrWidth': 'attr.width',
     '$autoCapitalize': 'attr.autocapitalize',
     '$autoComplete': 'atrr.autocomplete',
     '$autoFocus': 'attr.autofocus',
@@ -341,7 +350,7 @@ const PropUtil = {
     '$minLength': 'attr.minlength',
     '$multiple': 'attr.multiple',
     '$muted': 'attr.muted',
-    // '$name': 'attr.name',
+    '$attrName': 'attr.name',
     '$nonce': 'attr.nonce',
     '$noResize': 'attr.noresize',
     '$noShade': 'attr.noshade',
@@ -397,8 +406,8 @@ const PropUtil = {
     '$vSpace': 'attr.vspace',
     '$wrap': 'attr.wrap',
     'className': 'attr.class',
-    // "default": 'attr.default',
-    // "for": 'attr.for',
+    "attrDefault": 'attr.default',
+    "attrFor": 'attr.for',
 
     // functional attributes
     '$globalStyle': (v) => {
@@ -408,22 +417,22 @@ const PropUtil = {
     },
     '$pseudoFirstChild': (v) => {
       return `
-        & > :first-child { ${parseNativeStyle(v)} }
+        &::first-child { ${parseNativeStyle(v)} }
       `;
     },
     '$pseudoLastChild': (v) => {
       return `
-        & > :last-child { ${parseNativeStyle(v)} }
+        &::last-child { ${parseNativeStyle(v)} }
       `;
     },
     '$pseudoBefore': (v) => {
       return `
-        & > :before { ${parseNativeStyle(v)} }
+        &::before { ${parseNativeStyle(v)} }
       `;
     },
     '$pseudoAfter': (v) => {
       return `
-        & > :after { ${parseNativeStyle(v)} }
+        &::after { ${parseNativeStyle(v)} }
       `;
     },
     '$pseudoSelection': (v) => {
