@@ -46,6 +46,7 @@ export class Component {
     if(this.$children.indexOf(child) > -1) {
       this.$children.splice(this.$children.indexOf(child), 1);
       this.$children = this.$children.filter(c => c !== undefined);
+      child.root = undefined;
       return this;
     }else {
       Handler.Error(Handler.Codes.noChildExist, 'RemoveChild:', child.name, this.name);
@@ -209,6 +210,7 @@ export class $RxElement {
     if(this.$children.indexOf(child) > -1) {
       this.$children.splice(this.$children.indexOf(child), 1);
       this.$children = this.$children.filter(i => i !== undefined);
+      child.root = undefined;
       return this;
     }else {
       Handler.Error(Handler.Codes.noChildExist, 'RemoveChild:', child.name, this.name);
@@ -283,6 +285,15 @@ export class $RxElement {
       return this.$children[0];
     }
     return;
+  }
+
+  style(style) {
+    if(style && style.className) {
+      this.className += ' ' + style.className;
+      this.$style = style;
+      return this;
+    }
+    return this.$style;
   }
 
   $init(tagName) {
@@ -495,9 +506,10 @@ const LayoutFunctions = {
     if(type(animation) === 'object' && !(animation instanceof Animation)) {
       const oldFrame = {}, options = animation.$ || {};
       animation.$ && delete animation.$;
+      this.$animation = this.$animation || {};
       for(let prop in animation) {
-        if(this.hasOwnProperty(prop)) {
-          oldFrame[prop] = this[prop];
+        if(this.$animation.hasOwnProperty(prop)) {
+          oldFrame[prop] = this.$animation[prop];
         }else {
           oldFrame[prop] = "initial";
         }
@@ -533,7 +545,7 @@ const LayoutFunctions = {
       completion && Function.prototype.call.apply(completion);
       const keyframe = this.$animation.$keyframes[this.$animation.$keyframes.length - 1];
       for(const prop in keyframe.frame) {
-        this[prop] = keyframe.frame[prop];
+        this.$animation[prop] = keyframe.frame[prop];
       }
       // this.$node.classList.remove(this.$animation.$name);
       // this.className = Array.from(this.$node.classList).join(' ');
@@ -544,10 +556,11 @@ const LayoutFunctions = {
     if(animation) {
       if(type(animation) === 'object' && !(animation instanceof Animation)) {
         const oldFrame = {}, options = animation.$ || {};
+        this.$animation = this.$animation || {};
         animation.$ && delete animation.$;
         for(let prop in animation) {
-          if(this.hasOwnProperty(prop)) {
-            oldFrame[prop] = this[prop];
+          if(this.$animation.hasOwnProperty(prop)) {
+            oldFrame[prop] = this.$animation[prop];
           }else {
             oldFrame[prop] = "initial";
           }
@@ -641,7 +654,7 @@ const LayoutFunctions = {
   },
   tag: function(tag) {
     if(tag !== undefined) {
-      this.$tag = tag;
+      this.$tag = Object.assign(this.tag() || {}, tag);
       return this;
     }
     return this.$tag;

@@ -3,7 +3,8 @@ import {
   Container as DefaultContainer,
   PageComponent as DefaultPageComponent,
   Section as DefaultSection,
-  H1 as DefaultH1
+  H1 as DefaultH1,
+  $RxElement
 } from '../core/components';
 
 export class Container extends DefaultContainer {
@@ -52,6 +53,12 @@ export class Button extends DefaultButton {
       .color(Color.textDark)
       .padding(8, 15).border(0)
       .backgroundColor(Color.$.darken(Color.background, 30))
+  }
+}
+
+export class Style {
+  constructor(name) {
+    this.className = name || 's'.toLowerCase() + Math.random().toString(36).substr(2, 9);
   }
 }
 /// Theme Utils -------------------------------------->

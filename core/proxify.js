@@ -8,10 +8,17 @@ const $observeArray = (object, value, key) => {
   value.push = (item) => {
     Array.prototype.push.call(value, item);
     if(Native && Native.served) {
-      Native.$notify({
-        oldObj: oldObj, newObj: object, oldVal: oldVal, newVal: value,
-        key: key, index: value.indexOf(item), count: 1
-      }, MOD_TYPE.insert);
+      if(key === '$children') {
+        Native.$notify({
+          oldObj: oldObj, newObj: object, oldVal: oldVal, newVal: value,
+          key: key, index: value.indexOf(item), count: 1
+        }, MOD_TYPE.insert);
+      }else {
+        Native.$notify({
+          oldObj: oldObj, newObj: object, oldVal: oldVal,
+          newVal: value, key: key
+        }, MOD_TYPE.update);
+      }
     }
   };
 
@@ -37,10 +44,12 @@ const $observeArray = (object, value, key) => {
   value.unshift = (item) => {
     Array.prototype.unshift.call(value, item);
     if(Native && Native.served) {
-      Native.$notify({
-        oldObj: oldObj, newObj: object, oldVal: oldVal, newVal: value,
-        key: key, index: 0, count: 1
-      }, MOD_TYPE.insert);
+      if(key === '$children') {
+        Native.$notify({
+          oldObj: oldObj, newObj: object, oldVal: oldVal, newVal: value,
+          key: key, index: 0, count: 1
+        }, MOD_TYPE.update);
+      }
     }
   };
 
@@ -112,7 +121,7 @@ export const Proxify = (object) => {
       const old = object[name];
       const oldObj = object;
       if (value && typeof value == 'object' && name != '__proto__'
-        && name != 'root' && name != 'events' && name != '$node' && name != '$model') {
+        && name != 'root' && name != 'events' && name != '$node' && name != '$model' && name != '$styles') {
         if(value instanceof Array) {
           $observeArray(object, value, name);
         }else if(!value.__proxy__){
@@ -138,13 +147,14 @@ export const Proxify = (object) => {
             }
           }
         }else {
-          console.log(object);
+          // console.log(object);
         }
       }
       if(name != '__proto__' && name != '$native' && object.tagName != 'window.RxElement'
         && name != 'tagName' && name != 'animations' && name != '$node' && name != 'root'
-        && name != 'className' && name != '$children' && name != 'cssRules') {
-        if(Native && Native.served) {
+        && name != 'className' && name != '$children' && name != 'cssRules'
+        && name[0] != '$') {
+        if(Native && Native.served && object.$hostComponent) {
           Native.$notify({
             oldObj: oldObj, newObj: object, oldVal: old,
             newVal: value, key: name
@@ -179,7 +189,7 @@ export const ProxifyComponent = (object, componentName, nid) => {
       const old = object[name];
       const oldObj = object;
       if(type(value) === 'object' && name != '$children'
-        && name != '__root__' && name != 'state') {
+        && name != '__root__' && name != 'state' && name != '$styles') {
         if(value instanceof $RxElement && !value.__proxy__) {
           value = Proxify(value);
         }else if(!value.__proxy__) {
@@ -206,7 +216,8 @@ export const ProxifyComponent = (object, componentName, nid) => {
       }
       if(name != '__proto__' && name != '$native' && object.tagName != 'window.RxElement'
         && name != 'tagName' && name != 'animations' && name != '$node' && name != 'root'
-        && name != 'className' && name != '$children' && name != 'cssRules') {
+        && name != 'className' && name != '$children' && name != 'cssRules'
+        && name[0] != '$') {
         if(Native && Native.served) {
           Native.$notify({
             oldObj: oldObj, newObj: object, oldVal: old,

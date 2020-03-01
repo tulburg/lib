@@ -25,58 +25,47 @@ export const createSheet = function (data) {
   return style.sheet;
 };
 
-export const updateRules = function (sheet, rules) {
-  // This should merge same selectors
-  const added = [];
-  const extract = (rule) => {
-    return rule.trim().substring(rule.indexOf('{') + 1, rule.indexOf('}') - 2)
-      .trim().split(';').map(s => s.trim());
-  };
-  const pair = (v) => {
-    const value = v.split(':').map(s => s.trim());
-    return { name: value[0], value: value[1]};
-  };
-  const depair = (n, v) => {
-    return `${n}: ${v}`;
-  };
-  rules.map(css => {
-    const selector = css.slice(0, css.indexOf('{')).trim();
-    const maxLength = sheet.cssRules.length;
-    for(let i = 0; i < maxLength; i++) {
-      if(sheet.cssRules[i].selectorText == selector) {
-        const oldX = extract(sheet.cssRules[i].cssText);
-        const newX = extract(css);
-        for(let j = 0; j < newX.length; j++) {
-          let set = false;
-          for(let k = 0; k < oldX.length; k++) {
-            if(pair(oldX[k]).name == pair(newX[j]).name){
-              if(pair(oldX[k]).value != pair(newX[j]).value) {
-                oldX[k] = depair(pair(oldX[k]).name, pair(newX[j]).value);
-              }
-              set = true;
-            }
-          }
-          if(!set) {
-            oldX.push(depair(pair(newX[j]).name, pair(newX[j]).value));
-          }
-        }
-        const newRule = sheet.cssRules[i].selectorText + ' { ' + oldX.join('; ')+';' + ' } ';
-        try{
-          sheet.insertRule(newRule, i);
-          sheet.deleteRule(i+1);
-        }catch(e) { throw Error('Rule not applied '+newRule); }
-        added.push(css);
+export const createRules = function(object, rules) {
+  const sheet = Native.sheet;
+  rules.forEach(css => {
+    try {
+      const length = sheet.cssRules.length;
+      sheet.insertRule(css, length);
+      object.$styles = object.$styles || [];
+      object.$styles.push(sheet.cssRules[length]);
+    }catch(e) {
+      throw new Error('Rule not applied: ' + css + e.message);
+    }
+  });
+}
+
+export const updateRules = function (object, rules) {
+  if(!object.$styles) return createRules(object, rules);
+  rules.forEach(rule => {
+    const selector = rule.substring(0, rule.indexOf('{')).trim();
+    for(let i = 0; i < object.$styles.length; i++) {
+      const css = object.$styles[i];
+      if(css.selectorText === selector) {
+        // console.log("found >", css);
       }
     }
   });
-  for(let i = 0; i < rules.length; i++) {
-    if(added.indexOf(rules[i]) < 0) {
-      try {
-        sheet.insertRule(rules[i], sheet.cssRules.length);
-      }catch(e) {
-        throw Error('Rule not applied: ' + rules[i] + ' ', e.message);
-      }
-    }
-  }
 };
 
+export const updateClassRules = function(object, rules) {
+  return rules.map(css => {
+    return css.replace(/([\.\b])\w+/g, '.' + object.className.split(' ').join('.'));
+  });
+}
+
+const extract = (rule) => {
+  return rule.trim().substring(rule.indexOf('{') + 1, rule.indexOf('}') - 2)
+    .trim().split(';').map(s => s.trim());
+};
+const pair = (v) => {
+  const value = v.split(':').map(s => s.trim());
+  return { name: value[0], value: value[1]};
+};
+const depair = (n, v) => {
+  return `${n}: ${v}`;
+};

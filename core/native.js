@@ -1,5 +1,5 @@
 import Parser from './parser';
-import { createSheet, updateRules } from './style';
+import { createSheet, createRules, updateRules, updateClassRules } from './style';
 import { MOD_TYPE } from './util';
 import { $RxElement } from './components';
 
@@ -21,7 +21,7 @@ class Native {
       for(const key in theme.Globals) {
         styles.push(key +' { ' + Parser.parseNativeStyle(theme.Globals[key]) + ' } ');
       }
-      return updateRules(this.sheet, styles);
+      return createRules(this, styles);
     }
   }
 
@@ -29,6 +29,7 @@ class Native {
   // type: MOD_TYPE
   $notify (data, type) {
     const $ = (id) => document.querySelector('.'+id);
+    // console.log(data, type);
     let newNode, node, styles;
     if (type == MOD_TYPE.insert) {
       if(data.key != 'animations') {
@@ -84,11 +85,13 @@ class Native {
             Parser.parseProperties(data.newObj, styles);
           // }
           data.newObj.cssRules = styles;
+          // console.log(data.newObj, styles);
         // }
 
         this.patchAttrs(data.oldObj.$node, data.newObj.$node);
         this.patchProps(data.oldObj, data.newObj);
-        this.patchCSSRules(data.oldObj, data.newObj);
+        // this.patchCSSRules(data.oldObj, data.newObj);
+        updateRules(data.oldObj, updateClassRules(data.oldObj, styles));
         // if(node) node.parentNode.replaceChild(newNode, node);
       // }
 
@@ -129,11 +132,11 @@ class Native {
       }
     }
 
-    if (styles) {
-      if (this.sheet != undefined) {
-        updateRules(this.sheet, styles);
-      }
-    }
+    // if (styles) {
+    //   if (this.sheet != undefined) {
+    //     updateRules(this.sheet, styles);
+    //   }
+    // }
   }
 
   $toggleActive(node) {
@@ -272,31 +275,7 @@ class Native {
   }
 
   patchCSSRules(object, newObject ) {
-    const inserts = [];
-    for(let i = 0; i < this.sheet.cssRules.length; i++) {
-      for(let j = 0; j < object.cssRules.length; j++) {
-        const oRule = object.cssRules[j];
-        const oSelector = oRule.substring(0, oRule.indexOf('{')).trim();
-        if(!this.sheet.cssRules[i]) continue;
-        const nSelector = this.sheet.cssRules[i].selectorText;
-        if(oSelector === nSelector) {
-          for(let k = 0; k < newObject.cssRules.length; k++) {
-            const newRule = newObject.cssRules[k];
-            const createRule = newRule.replace(newObject.className, object.className);
-            try {
-              this.sheet.deleteRule(i);
-              inserts.push(createRule);
-            } catch(err) { console.error('Could\'t delete rule ' + err); }
-          }
-        }
-      }
-    }
-
-    for(let m = 0; m < inserts.length; m++) {
-      try {
-        this.sheet.insertRule(inserts[m], this.sheet.cssRules.length);
-      }catch(err) { console.error('Could\'t update rule ' + err); }
-    }
+    updateRules(newObject, newObject.cssRules);
   }
 
   updateState(name, nid) {
@@ -380,7 +359,8 @@ class Native {
       }
       item.$node = c;
       item.cssRules = rule;
-      rules = rules.concat(rule);
+      // rules = rules.concat(rule);
+      createRules(item, rule);
       if(parent) parent.appendChild(c);
       if(item.$level === 0 && parent != undefined) {
         const oldServing = this.serving;
@@ -410,7 +390,7 @@ class Native {
         }
 
         queueMicrotask(() => {
-          updateRules(this.sheet, newInstance.cssRules);
+          // updateRules(this.sheet, newInstance.cssRules);
 
           if(this.components[component.name][nid].rootNode == undefined) {
             this.components[component.name][nid].rootNode = item.$node;
@@ -471,7 +451,7 @@ class Native {
     }
     // const parsed = Parser.parse(this.components[route.name].instance);
     const rootNode = this.createElement(newInstance);// createElement(parsed.tree);
-    updateRules(this.sheet, newInstance.cssRules);
+    // updateRules(this.sheet, newInstance.cssRules);
     if(this.components[component.name][nid].rootNode == undefined) {
       this.components[component.name][nid].rootNode = rootNode;
     }

@@ -528,7 +528,8 @@ const PropUtil = {
     '$backgroundGradient',
     '$flexSpaceBetween',
     '$flexCenter',
-    '$responsiveness'
+    '$responsiveness',
+    '$styles'
   ],
   anims: {
     '$timingFunction': 'animation-timing-function',
