@@ -17,9 +17,10 @@ class Native {
 
   writeGlobals (theme) {
     const styles = [];
-    if (theme.Globals) {
-      for(const key in theme.Globals) {
-        styles.push(key +' { ' + Parser.parseNativeStyle(theme.Globals[key]) + ' } ');
+    const globals = theme.globals || theme.Globals;
+    if (globals) {
+      for(const key in globals) {
+        styles.push(key +' { ' + Parser.parseNativeStyle(globals[key]) + ' } ');
       }
       return createRules(this, styles);
     }
